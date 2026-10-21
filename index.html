@@ -29,9 +29,11 @@ img { max-width: 100%; }
   --ink-3: #868E96;
   --line: #DCE0E4;
   --line-strong: #B6BDC4;
-  --accent: #8E1B1B;
-  --accent-ink: #7C1616;
-  --accent-soft: #F4E2E0;
+  --accent: #6B47C9;
+  --accent-ink: #5536A8;
+  --accent-soft: #ECE6FA;
+  --rainbow: linear-gradient(90deg, #D93A3A, #E2761B, #C99A00, #2E9E5B, #2F6FD0, #6B47C9);
+  --cat-alpha: 0.2;
   --on-accent: #FFFFFF;
   --red: #D4261A;
   --red-ink: #B01E14;
@@ -47,14 +49,16 @@ img { max-width: 100%; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
     --bg: #14171A; --surface: #1D2125; --surface-2: #24292E; --ink: #E7EAED; --ink-2: #A3ABB3; --ink-3: #78818A;
-    --line: #2F353B; --line-strong: #48505A; --accent: #B83A3A; --accent-ink: #E58C86; --accent-soft: #3A1E1F;
+    --line: #2F353B; --line-strong: #48505A; --accent: #9C82F0; --accent-ink: #B9A6F7; --accent-soft: #2A2340;
+    --rainbow: linear-gradient(90deg, #F2645E, #F59140, #E6C040, #4CC383, #5A96EA, #9C82F0); --cat-alpha: 0.24;
     --on-accent: #FFFFFF; --red: #FF6A5C; --red-ink: #FFA59B; --red-soft: #431B1A; --shadow: 0 1px 2px rgba(0,0,0,.3);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
   --bg: #14171A; --surface: #1D2125; --surface-2: #24292E; --ink: #E7EAED; --ink-2: #A3ABB3; --ink-3: #78818A;
-  --line: #2F353B; --line-strong: #48505A; --accent: #B83A3A; --accent-ink: #E58C86; --accent-soft: #3A1E1F;
+  --line: #2F353B; --line-strong: #48505A; --accent: #9C82F0; --accent-ink: #B9A6F7; --accent-soft: #2A2340;
+    --rainbow: linear-gradient(90deg, #F2645E, #F59140, #E6C040, #4CC383, #5A96EA, #9C82F0); --cat-alpha: 0.24;
   --on-accent: #FFFFFF; --red: #FF6A5C; --red-ink: #FFA59B; --red-soft: #431B1A; --shadow: 0 1px 2px rgba(0,0,0,.3);
   color-scheme: dark;
 }
@@ -230,10 +234,26 @@ button, input { font: inherit; color: inherit; }
 .toast button { background: none; border: 0; color: var(--accent); font-weight: 700; cursor: pointer; padding: 4px; font-size: 1rem; }
 :root[data-theme="dark"] .toast button { color: var(--accent-ink); }
 
+/* Rainbow accent */
+.top h1 { background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .06em; }
+.btn-primary { background: var(--rainbow); color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+.progress span { background: var(--rainbow); }
+.item input[type="checkbox"]:checked { background: var(--rainbow); border-color: transparent; }
+.item input[type="checkbox"]::before { background: #FFFFFF; }
+.toggle[aria-pressed="true"] .track { background: var(--rainbow); }
+.owner { position: relative; }
+.owner::before { content: ""; position: absolute; inset: 0 0 auto; height: 3px; background: var(--rainbow); opacity: .85; }
+
+/* Cats walking behind the page */
+#cats { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+.wrap { position: relative; z-index: 1; }
+.toast { z-index: 2; }
+
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
 <body>
+<canvas id="cats" aria-hidden="true"></canvas>
 <main class="wrap">
   <header class="top">
     <div>
@@ -551,5 +571,114 @@ button, input { font: inherit; color: inherit; }
   render();
 })();
 </script>
+<script>
+(function () {
+  var canvas = document.getElementById('cats');
+  if (!canvas || !canvas.getContext) return;
+  var ctx = canvas.getContext('2d');
+  var hues = ['#D93A3A', '#E2761B', '#C99A00', '#2E9E5B', '#2F6FD0', '#6B47C9'];
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var W = 0, H = 0, dpr = 1, cats = [], alpha = 0.2, bg = '#EDEFF1', frame = 0, last = 0;
+
+  function readTheme() {
+    var cs = getComputedStyle(document.documentElement);
+    alpha = parseFloat(cs.getPropertyValue('--cat-alpha')) || 0.2;
+    bg = cs.getPropertyValue('--bg').trim() || bg;
+  }
+  function resize() {
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = window.innerWidth; H = window.innerHeight;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+  function rand(a, b) { return a + Math.random() * (b - a); }
+  function spawn(c, initial) {
+    c.s = rand(0.7, 1.35);
+    c.dir = Math.random() < 0.5 ? 1 : -1;
+    c.speed = rand(22, 48) * (0.8 + c.s * 0.3);
+    c.y = rand(90, Math.max(140, H - 20));
+    c.x = initial ? rand(0, W) : (c.dir > 0 ? -90 * c.s : W + 90 * c.s);
+    c.phase = rand(0, 6.28);
+    c.tail = rand(0, 6.28);
+    return c;
+  }
+  function makeCats() {
+    var n = Math.max(4, Math.min(9, Math.round(W * H / 150000)));
+    cats = [];
+    for (var i = 0; i < n; i++) { var c = spawn({}, true); c.color = hues[i % hues.length]; cats.push(c); }
+  }
+
+  function leg(x, swing) {
+    ctx.beginPath();
+    ctx.moveTo(x, -16);
+    ctx.lineTo(x + Math.sin(swing) * 7, 0);
+    ctx.stroke();
+  }
+  function drawCat(c) {
+    var bob = Math.abs(Math.sin(c.phase)) * 1.6;
+    ctx.save();
+    ctx.translate(c.x, c.y);
+    ctx.scale(c.s * c.dir, c.s);
+    ctx.globalAlpha = alpha;
+    ctx.fillStyle = c.color; ctx.strokeStyle = c.color;
+    ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+    // legs
+    ctx.lineWidth = 5;
+    leg(17, c.phase); leg(-15, c.phase + Math.PI);
+    ctx.globalAlpha = alpha * 0.7;
+    leg(12, c.phase + Math.PI); leg(-20, c.phase);
+    ctx.globalAlpha = alpha;
+
+    ctx.translate(0, -bob);
+    // tail
+    var t = Math.sin(c.tail) * 6;
+    ctx.lineWidth = 5;
+    ctx.beginPath();
+    ctx.moveTo(-24, -24);
+    ctx.quadraticCurveTo(-44, -28 + t * 0.5, -42 + t * 0.6, -50 + t);
+    ctx.stroke();
+    // body
+    ctx.beginPath(); ctx.ellipse(0, -23, 27, 12, 0, 0, Math.PI * 2); ctx.fill();
+    // head
+    ctx.beginPath(); ctx.arc(28, -35, 11, 0, Math.PI * 2); ctx.fill();
+    // ears
+    ctx.beginPath();
+    ctx.moveTo(19, -40); ctx.lineTo(21, -55); ctx.lineTo(28, -45);
+    ctx.moveTo(28, -45); ctx.lineTo(35, -55); ctx.lineTo(38, -39);
+    ctx.fill();
+    // eye
+    ctx.globalAlpha = Math.min(1, alpha * 3);
+    ctx.fillStyle = bg;
+    ctx.beginPath(); ctx.arc(32, -37, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    for (var i = 0; i < cats.length; i++) drawCat(cats[i]);
+  }
+  function tick(now) {
+    var dt = last ? Math.min(0.05, (now - last) / 1000) : 0;
+    last = now;
+    if (++frame % 60 === 0) readTheme();
+    for (var i = 0; i < cats.length; i++) {
+      var c = cats[i];
+      c.x += c.dir * c.speed * dt;
+      c.phase += dt * c.speed / 7;
+      c.tail += dt * 2.2;
+      if ((c.dir > 0 && c.x > W + 100 * c.s) || (c.dir < 0 && c.x < -100 * c.s)) spawn(c, false);
+    }
+    draw();
+    requestAnimationFrame(tick);
+  }
+
+  readTheme(); resize(); makeCats();
+  window.addEventListener('resize', function () { resize(); makeCats(); if (reduce) draw(); });
+  if (reduce) { draw(); return; }
+  requestAnimationFrame(tick);
+})();
+</script>
+
 </body>
 </html>
