@@ -1,0 +1,555 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Track actions agreed in meetings by owner, with due dates, done ticks and overdue alerts.">
+<meta name="theme-color" content="#EDEFF1" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#14171A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<style>
+/* Base reset (safe-area padding for phones with notches) */
+:root { color-scheme: light; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body { margin: 0; }
+img { max-width: 100%; }
+[hidden] { display: none !important; }
+</style>
+<title>Meeting Action Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&display=swap">
+<style>
+/* Layout: one narrow column — header, three tally tiles, the add card, then owner cards in a wrapping grid. */
+:root {
+  --bg: #EDEFF1;
+  --surface: #FFFFFF;
+  --surface-2: #F5F6F7;
+  --ink: #1E2327;
+  --ink-2: #565E66;
+  --ink-3: #868E96;
+  --line: #DCE0E4;
+  --line-strong: #B6BDC4;
+  --accent: #D8651C;
+  --accent-ink: #B0500F;
+  --accent-soft: #FBEADC;
+  --on-accent: #FFFFFF;
+  --red: #C0342B;
+  --red-ink: #9C241C;
+  --red-soft: #FBE6E4;
+  --shadow: 0 1px 2px rgba(30, 35, 39, .05), 0 4px 14px rgba(30, 35, 39, .05);
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, sans-serif;
+  --font-body: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+
+  --r-card: 18px;
+  --r-ctl: 12px;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14171A; --surface: #1D2125; --surface-2: #24292E; --ink: #E7EAED; --ink-2: #A3ABB3; --ink-3: #78818A;
+    --line: #2F353B; --line-strong: #48505A; --accent: #F08A3E; --accent-ink: #F6A26A; --accent-soft: #3A291C;
+    --on-accent: #1A1108; --red: #EE6A5E; --red-ink: #FF9C92; --red-soft: #3A1F21; --shadow: 0 1px 2px rgba(0,0,0,.3);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14171A; --surface: #1D2125; --surface-2: #24292E; --ink: #E7EAED; --ink-2: #A3ABB3; --ink-3: #78818A;
+  --line: #2F353B; --line-strong: #48505A; --accent: #F08A3E; --accent-ink: #F6A26A; --accent-soft: #3A291C;
+  --on-accent: #1A1108; --red: #EE6A5E; --red-ink: #FF9C92; --red-soft: #3A1F21; --shadow: 0 1px 2px rgba(0,0,0,.3);
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.125rem;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 40px 96px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; letter-spacing: -0.01em; }
+button, input { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--accent); outline-offset: 2px; }
+
+/* Header */
+.top { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 12px 24px; }
+.top h1 { font-size: clamp(2rem, 5vw, 2.75rem); font-weight: 700; line-height: 1.05; }
+.top p { margin: 8px 0 0; color: var(--ink-2); font-size: 1.125rem; }
+.today { color: var(--ink-2); font-size: 1rem; }
+.today strong { color: var(--ink); font-weight: 700; }
+
+/* Tallies */
+.tallies { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.tally {
+  background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow);
+  padding: 18px 20px; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.tally .n { font-family: var(--font-display); font-size: clamp(2rem, 6vw, 2.75rem); font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.tally .l { font-size: .8125rem; text-transform: uppercase; letter-spacing: .08em; color: var(--ink-2); font-weight: 700; }
+.tally.overdue.has .n { color: var(--red); }
+.tally.overdue.has { background: var(--red-soft); box-shadow: none; }
+.tally.overdue.has .l { color: var(--red-ink); }
+.tally .sub { font-size: .9375rem; color: var(--ink-3); }
+
+/* Add form */
+.add {
+  background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow);
+  padding: 22px; display: grid; gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 220px) minmax(0, 190px) auto;
+  align-items: end;
+}
+.add h2 { grid-column: 1 / -1; font-size: 1.25rem; font-weight: 600; }
+.field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.field label { font-size: .9375rem; font-weight: 700; color: var(--ink-2); }
+.field input {
+  width: 100%; height: 52px; padding: 0 14px; font-size: 1.125rem;
+  background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r-ctl);
+}
+.field input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.field input::placeholder { color: var(--ink-3); }
+.btn-primary {
+  height: 52px; padding: 0 24px; border: 0; border-radius: var(--r-ctl);
+  background: var(--accent); color: var(--on-accent); font-weight: 700; font-size: 1.125rem; cursor: pointer;
+  white-space: nowrap;
+}
+.btn-primary:hover { filter: brightness(1.06); }
+.form-error { grid-column: 1 / -1; margin: -4px 0 0; color: var(--red-ink); font-size: 1rem; }
+
+@media (max-width: 860px) {
+  .add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+  .add .f-text { grid-column: 1 / -1; }
+  .add .btn-primary { grid-column: 1 / -1; }
+}
+@media (max-width: 480px) {
+  .add { grid-template-columns: minmax(0, 1fr); padding: 18px; }
+  .tally { padding: 14px; }
+  .tally .sub { display: none; }
+}
+
+/* Toolbar */
+.bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+.bar h2 { font-size: 1.5rem; font-weight: 700; }
+.bar-right { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; }
+.toggle {
+  display: inline-flex; align-items: center; gap: 10px; background: none; border: 0; padding: 6px 0; cursor: pointer;
+  color: var(--ink-2); font-size: 1rem;
+}
+.toggle .track { width: 44px; height: 26px; border-radius: 99px; background: var(--line-strong); position: relative; transition: background .15s; }
+.toggle .track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: var(--surface); transition: transform .15s; }
+.toggle[aria-pressed="true"] .track { background: var(--accent); }
+.toggle[aria-pressed="true"] .track::after { transform: translateX(18px); }
+.sample-note {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  background: var(--accent-soft); color: var(--ink); border-radius: var(--r-ctl); padding: 10px 14px; font-size: 1rem;
+}
+.link-btn { background: none; border: 0; padding: 0; color: var(--accent-ink); font-weight: 700; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font-size: 1rem; }
+
+/* Owner cards */
+.owners { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr)); gap: 16px; align-items: start; }
+.owner { background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; min-width: 0; }
+.owner-head { padding: 18px 20px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 4px 14px; align-items: center; }
+.avatar {
+  grid-row: span 2; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center;
+  background: var(--surface-2); color: var(--ink-2); font-family: var(--font-display); font-weight: 700; font-size: 1.0625rem;
+  border: 1.5px solid var(--line);
+}
+.owner-head h3 { font-size: 1.3125rem; font-weight: 700; overflow-wrap: anywhere; }
+.owner-meta { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; color: var(--ink-2); font-size: .9375rem; }
+.pill-red { background: var(--red); color: #fff; border-radius: 99px; padding: 1px 10px; font-weight: 700; font-size: .875rem; }
+:root[data-theme="dark"] .pill-red { color: #1A0B0A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .pill-red { color: #1A0B0A; } }
+.progress { height: 4px; background: var(--surface-2); }
+.progress span { display: block; height: 100%; background: var(--accent); transition: width .25s; }
+
+.items { list-style: none; margin: 0; padding: 6px 0; }
+.item {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr) 36px; gap: 14px; align-items: start;
+  padding: 14px 14px 14px 20px; border-top: 1px solid var(--line);
+}
+.item:first-child { border-top: 0; }
+.item.is-overdue { background: var(--red-soft); border-top-color: transparent; }
+.item.is-overdue + .item { border-top-color: transparent; }
+.item input[type="checkbox"] {
+  appearance: none; -webkit-appearance: none; margin: 2px 0 0; width: 28px; height: 28px; cursor: pointer;
+  border: 2px solid var(--line-strong); border-radius: 8px; background: var(--surface); display: grid; place-content: center;
+  transition: background .12s, border-color .12s;
+}
+.item input[type="checkbox"]::before {
+  content: ""; width: 14px; height: 14px; background: var(--on-accent);
+  clip-path: polygon(14% 52%, 0 66%, 38% 100%, 100% 22%, 86% 8%, 38% 72%); transform: scale(0); transition: transform .12s;
+}
+.item input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); }
+.item input[type="checkbox"]:checked::before { transform: scale(1); }
+.item.is-overdue input[type="checkbox"] { border-color: var(--red); }
+.item-body { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.item-text { font-size: 1.125rem; line-height: 1.4; overflow-wrap: anywhere; cursor: pointer; }
+.item.is-overdue .item-text { color: var(--red-ink); font-weight: 700; }
+.due { font-size: .9375rem; color: var(--ink-2); display: flex; flex-wrap: wrap; gap: 4px 8px; align-items: center; }
+.due .tag { border-radius: 99px; padding: 1px 10px; font-weight: 700; font-size: .875rem; }
+.due .tag.over { background: var(--red); color: #fff; }
+:root[data-theme="dark"] .due .tag.over { color: #1A0B0A; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .due .tag.over { color: #1A0B0A; } }
+.due .tag.today { background: var(--accent-soft); color: var(--accent-ink); }
+.item.is-overdue .due { color: var(--red-ink); }
+.item.is-done .item-text { color: var(--ink-3); text-decoration: line-through; text-decoration-thickness: 1.5px; }
+.item.is-done .due { color: var(--ink-3); }
+.del {
+  width: 36px; height: 36px; border: 0; border-radius: 10px; background: none; color: var(--ink-3);
+  font-size: 1.375rem; line-height: 1; cursor: pointer; display: grid; place-items: center;
+}
+.del:hover { background: var(--surface-2); color: var(--ink); }
+.hidden-done { padding: 10px 20px 16px; color: var(--ink-3); font-size: .9375rem; }
+
+.empty {
+  grid-column: 1 / -1; background: var(--surface); border: 2px dashed var(--line); border-radius: var(--r-card);
+  padding: 36px 24px; text-align: center; color: var(--ink-2);
+}
+.empty strong { display: block; color: var(--ink); font-family: var(--font-display); font-size: 1.375rem; margin-bottom: 6px; }
+
+.storage-warn { color: var(--red-ink); font-size: .9375rem; margin: 0; }
+
+/* Toast */
+.toast {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(20px + env(safe-area-inset-bottom, 0px));
+  max-width: calc(100% - 32px); display: flex; align-items: center; gap: 16px;
+  background: var(--ink); color: var(--bg); border-radius: 14px; padding: 12px 18px; font-size: 1rem;
+  box-shadow: 0 8px 28px rgba(0,0,0,.2);
+}
+.toast button { background: none; border: 0; color: var(--accent); font-weight: 700; cursor: pointer; padding: 4px; font-size: 1rem; }
+:root[data-theme="dark"] .toast button { color: var(--accent-ink); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <header class="top">
+    <div>
+      <h1>Meeting actions</h1>
+      <p>Everything agreed in the room, with a name and a date on it.</p>
+    </div>
+    <div class="today" id="today"></div>
+  </header>
+
+  <section class="tallies" aria-label="Summary">
+    <div class="tally"><span class="l">Open</span><span class="n" id="n-open">0</span><span class="sub" id="s-open">&nbsp;</span></div>
+    <div class="tally overdue" id="t-overdue"><span class="l">Overdue</span><span class="n" id="n-overdue">0</span><span class="sub" id="s-overdue">&nbsp;</span></div>
+    <div class="tally"><span class="l">Done</span><span class="n" id="n-done">0</span><span class="sub" id="s-done">&nbsp;</span></div>
+  </section>
+
+  <form class="add" id="add-form" novalidate>
+    <h2>Add an action</h2>
+    <div class="field f-text">
+      <label for="f-text">What was agreed</label>
+      <input id="f-text" type="text" autocomplete="off" placeholder="e.g. Send the revised proposal to the client">
+    </div>
+    <div class="field">
+      <label for="f-owner">Owner</label>
+      <input id="f-owner" type="text" list="owner-list" autocomplete="off" placeholder="Who's doing it">
+      <datalist id="owner-list"></datalist>
+    </div>
+    <div class="field">
+      <label for="f-due">Due date</label>
+      <input id="f-due" type="date">
+    </div>
+    <button class="btn-primary" type="submit">Add action</button>
+    <p class="form-error" id="form-error" hidden></p>
+  </form>
+
+  <div class="bar">
+    <h2>By owner</h2>
+    <div class="bar-right">
+      <div class="sample-note" id="sample-note" hidden>
+        <span>These are example actions.</span>
+        <button class="link-btn" type="button" id="clear-samples">Remove examples</button>
+      </div>
+      <button class="toggle" type="button" id="toggle-done" aria-pressed="false">
+        <span class="track" aria-hidden="true"></span><span>Hide done</span>
+      </button>
+    </div>
+  </div>
+  <p class="storage-warn" id="storage-warn" hidden>This browser is blocking storage, so actions won't be kept after you close the page.</p>
+
+  <section class="owners" id="owners" aria-live="polite"></section>
+</main>
+
+<div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
+
+<script>
+(function () {
+  var KEY = 'meeting-action-tracker-v1';
+  var storageOk = true;
+
+  function pad(n) { return String(n).padStart(2, '0'); }
+  function iso(d) { return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate()); }
+  function todayIso() { return iso(new Date()); }
+  function addDays(n) { var d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() + n); return iso(d); }
+  function parse(s) { var p = s.split('-').map(Number); return new Date(p[0], p[1] - 1, p[2], 12); }
+  function daysFromToday(s) { return Math.round((parse(s) - parse(todayIso())) / 86400000); }
+  function fmt(s) { return parse(s).toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short' }); }
+  function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
+
+  function sampleData() {
+    var now = Date.now();
+    function a(text, owner, due, done) {
+      return { id: uid(), text: text, owner: owner, due: due, done: !!done, doneAt: done ? now : null, createdAt: now, sample: true };
+    }
+    return [
+      a('Send the revised Q4 budget to finance', 'Priya', addDays(-3)),
+      a('Book a venue for the client workshop', 'Priya', addDays(5)),
+      a('Share the draft onboarding checklist with the team', 'Marcus', addDays(-1)),
+      a('Chase the supplier for confirmed delivery dates', 'Marcus', addDays(0)),
+      a('Update the project timeline in the shared drive', 'Marcus', addDays(-2), true),
+      a('Collect feedback from the pilot users', 'Aisha', addDays(2)),
+      a('Circulate notes from Monday’s meeting', 'Aisha', addDays(-2), true),
+      a('Fix the broken link on the pricing page', 'Ben', addDays(9))
+    ];
+  }
+
+  var state = { actions: [], hideDone: false };
+  try {
+    var raw = localStorage.getItem(KEY);
+    if (raw) {
+      var parsed = JSON.parse(raw);
+      if (parsed && Array.isArray(parsed.actions)) state = { actions: parsed.actions, hideDone: !!parsed.hideDone };
+    } else {
+      state.actions = sampleData();
+    }
+  } catch (e) {
+    storageOk = false;
+    state.actions = sampleData();
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(state)); storageOk = true; }
+    catch (e) { storageOk = false; }
+    document.getElementById('storage-warn').hidden = storageOk;
+  }
+
+  // ---- Undo ----
+  var undoSnapshot = null, toastTimer = null;
+  var toast = document.getElementById('toast');
+  function showToast(msg, snapshot) {
+    undoSnapshot = snapshot;
+    document.getElementById('toast-msg').textContent = msg;
+    toast.hidden = false;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(function () { toast.hidden = true; undoSnapshot = null; }, 6000);
+  }
+  document.getElementById('toast-undo').addEventListener('click', function () {
+    if (undoSnapshot) { state.actions = undoSnapshot; undoSnapshot = null; save(); render(); }
+    toast.hidden = true;
+  });
+  function snapshot() { return state.actions.map(function (x) { return Object.assign({}, x); }); }
+
+  // ---- Helpers ----
+  function isOverdue(a) { return !a.done && daysFromToday(a.due) < 0; }
+  function initials(name) {
+    var parts = name.trim().split(/\s+/);
+    return ((parts[0] || '')[0] || '').toUpperCase() + ((parts[1] || '')[0] || '').toUpperCase();
+  }
+  function el(tag, cls, text) {
+    var n = document.createElement(tag);
+    if (cls) n.className = cls;
+    if (text != null) n.textContent = text;
+    return n;
+  }
+  function plural(n, w) { return n + ' ' + w + (n === 1 ? '' : 's'); }
+
+  function dueLine(a) {
+    var wrap = el('div', 'due');
+    var d = daysFromToday(a.due);
+    if (a.done) {
+      wrap.appendChild(el('span', null, 'Done' + (a.doneAt ? ' · was due ' + fmt(a.due) : '')));
+      return wrap;
+    }
+    if (d < 0) {
+      wrap.appendChild(el('span', 'tag over', 'Overdue ' + plural(-d, 'day')));
+      wrap.appendChild(el('span', null, 'was due ' + fmt(a.due)));
+    } else if (d === 0) {
+      wrap.appendChild(el('span', 'tag today', 'Due today'));
+    } else if (d === 1) {
+      wrap.appendChild(el('span', null, 'Due tomorrow · ' + fmt(a.due)));
+    } else {
+      wrap.appendChild(el('span', null, 'Due ' + fmt(a.due) + ' · in ' + d + ' days'));
+    }
+    return wrap;
+  }
+
+  // ---- Render ----
+  function render() {
+    var acts = state.actions;
+    var open = acts.filter(function (a) { return !a.done; });
+    var done = acts.filter(function (a) { return a.done; });
+    var overdue = open.filter(isOverdue);
+    var dueToday = open.filter(function (a) { return daysFromToday(a.due) === 0; });
+
+    document.getElementById('n-open').textContent = open.length;
+    document.getElementById('n-overdue').textContent = overdue.length;
+    document.getElementById('n-done').textContent = done.length;
+    document.getElementById('s-open').textContent = dueToday.length ? dueToday.length + ' due today' : (open.length ? 'none due today' : 'all clear');
+    document.getElementById('s-overdue').textContent = overdue.length ? 'needs chasing' : 'nothing late';
+    document.getElementById('s-done').textContent = acts.length ? Math.round(done.length / acts.length * 100) + '% of all actions' : ' ';
+    document.getElementById('t-overdue').classList.toggle('has', overdue.length > 0);
+
+    document.getElementById('sample-note').hidden = !acts.some(function (a) { return a.sample; });
+    var tg = document.getElementById('toggle-done');
+    tg.setAttribute('aria-pressed', state.hideDone ? 'true' : 'false');
+
+    // Group by owner (case-insensitive)
+    var groups = {};
+    acts.forEach(function (a) {
+      var k = a.owner.trim().toLowerCase();
+      if (!groups[k]) groups[k] = { name: a.owner.trim(), items: [] };
+      groups[k].items.push(a);
+    });
+    var list = Object.keys(groups).map(function (k) { return groups[k]; });
+    list.forEach(function (g) {
+      g.open = g.items.filter(function (a) { return !a.done; }).length;
+      g.overdue = g.items.filter(isOverdue).length;
+      g.items.sort(function (x, y) {
+        if (x.done !== y.done) return x.done ? 1 : -1;
+        if (!x.done) return x.due < y.due ? -1 : x.due > y.due ? 1 : 0;
+        return (y.doneAt || 0) - (x.doneAt || 0);
+      });
+    });
+    list.sort(function (a, b) { return b.overdue - a.overdue || b.open - a.open || a.name.localeCompare(b.name); });
+
+    // Owner suggestions
+    var dl = document.getElementById('owner-list');
+    dl.innerHTML = '';
+    list.forEach(function (g) { var o = document.createElement('option'); o.value = g.name; dl.appendChild(o); });
+
+    var root = document.getElementById('owners');
+    root.innerHTML = '';
+    if (!acts.length) {
+      var e = el('div', 'empty');
+      e.appendChild(el('strong', null, 'No actions yet'));
+      e.appendChild(el('span', null, 'Add the first one above. Each owner gets their own card.'));
+      root.appendChild(e);
+      return;
+    }
+
+    list.forEach(function (g) {
+      var card = el('article', 'owner');
+      var head = el('div', 'owner-head');
+      var av = el('div', 'avatar', initials(g.name)); av.setAttribute('aria-hidden', 'true');
+      head.appendChild(av);
+      head.appendChild(el('h3', null, g.name));
+      var meta = el('div', 'owner-meta');
+      var doneCount = g.items.length - g.open;
+      meta.appendChild(el('span', null, g.open + ' open · ' + doneCount + ' done'));
+      if (g.overdue) meta.appendChild(el('span', 'pill-red', g.overdue + ' overdue'));
+      head.appendChild(meta);
+      card.appendChild(head);
+
+      var prog = el('div', 'progress');
+      prog.setAttribute('role', 'img');
+      prog.setAttribute('aria-label', doneCount + ' of ' + g.items.length + ' done');
+      var bar = el('span'); bar.style.width = (g.items.length ? doneCount / g.items.length * 100 : 0) + '%';
+      prog.appendChild(bar);
+      card.appendChild(prog);
+
+      var ul = el('ul', 'items');
+      var hiddenCount = 0;
+      g.items.forEach(function (a) {
+        if (state.hideDone && a.done) { hiddenCount++; return; }
+        var li = el('li', 'item' + (a.done ? ' is-done' : '') + (isOverdue(a) ? ' is-overdue' : ''));
+        var cb = document.createElement('input');
+        cb.type = 'checkbox'; cb.id = 'chk-' + a.id; cb.checked = a.done;
+        cb.addEventListener('change', function () {
+          a.done = cb.checked; a.doneAt = cb.checked ? Date.now() : null;
+          save(); render();
+        });
+        var body = el('div', 'item-body');
+        var lab = el('label', 'item-text', a.text); lab.htmlFor = cb.id;
+        body.appendChild(lab);
+        body.appendChild(dueLine(a));
+        var del = el('button', 'del', '×');
+        del.type = 'button';
+        del.setAttribute('aria-label', 'Delete action: ' + a.text);
+        del.title = 'Delete';
+        del.addEventListener('click', function () {
+          var snap = snapshot();
+          state.actions = state.actions.filter(function (x) { return x.id !== a.id; });
+          save(); render();
+          showToast('Action deleted', snap);
+        });
+        li.appendChild(cb); li.appendChild(body); li.appendChild(del);
+        ul.appendChild(li);
+      });
+      if (ul.children.length) card.appendChild(ul);
+      if (hiddenCount) card.appendChild(el('div', 'hidden-done', plural(hiddenCount, 'done action') + ' hidden'));
+      root.appendChild(card);
+    });
+  }
+
+  // ---- Form ----
+  var form = document.getElementById('add-form');
+  var fText = document.getElementById('f-text');
+  var fOwner = document.getElementById('f-owner');
+  var fDue = document.getElementById('f-due');
+  var fErr = document.getElementById('form-error');
+  fDue.value = addDays(7);
+
+  form.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var text = fText.value.trim(), owner = fOwner.value.trim(), due = fDue.value;
+    var missing = [];
+    if (!text) missing.push('what was agreed');
+    if (!owner) missing.push('an owner');
+    if (!due) missing.push('a due date');
+    if (missing.length) {
+      fErr.textContent = 'Add ' + missing.join(', ').replace(/, ([^,]*)$/, ' and $1') + ' to save this action.';
+      fErr.hidden = false;
+      (!text ? fText : !owner ? fOwner : fDue).focus();
+      return;
+    }
+    // Reuse existing owner spelling
+    var match = state.actions.find(function (a) { return a.owner.trim().toLowerCase() === owner.toLowerCase(); });
+    if (match) owner = match.owner.trim();
+    state.actions.push({ id: uid(), text: text, owner: owner, due: due, done: false, doneAt: null, createdAt: Date.now() });
+    save(); render();
+    fErr.hidden = true;
+    fText.value = '';
+    fText.focus();
+  });
+
+  document.getElementById('toggle-done').addEventListener('click', function () {
+    state.hideDone = !state.hideDone; save(); render();
+  });
+  document.getElementById('clear-samples').addEventListener('click', function () {
+    var snap = snapshot();
+    var n = state.actions.filter(function (a) { return a.sample; }).length;
+    state.actions = state.actions.filter(function (a) { return !a.sample; });
+    save(); render();
+    showToast(plural(n, 'example') + ' removed', snap);
+  });
+
+  var t = new Date();
+  var td = document.getElementById('today');
+  td.innerHTML = '';
+  td.appendChild(document.createTextNode('Today is '));
+  td.appendChild(el('strong', null, t.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })));
+
+  // Re-check overdue status when the tab comes back (e.g. next morning)
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) render(); });
+
+  save();
+  render();
+})();
+</script>
+</body>
+</html>
