@@ -251,6 +251,72 @@ button, input { font: inherit; color: inherit; }
 .toast button { background: none; border: 0; color: var(--accent); font-weight: 700; cursor: pointer; padding: 4px; font-size: 1rem; }
 :root[data-theme="dark"] .toast button { color: var(--accent-ink); }
 
+/* Accounts */
+.boot { min-height: 60vh; display: grid; place-items: center; color: var(--ink-2); font-size: 1.125rem; position: relative; z-index: 1; }
+.gate { position: relative; z-index: 1; min-height: 100%; display: grid; place-items: center;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 8vh 48px; }
+.gate-card { width: 100%; max-width: 420px; background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow);
+  padding: 32px 28px; display: flex; flex-direction: column; gap: 16px; }
+.gate-card h1 { font-size: 2rem; font-weight: 700; line-height: 1.1; background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .06em; }
+.gate-intro { margin: -6px 0 4px; color: var(--ink-2); }
+.gate-card .btn-primary { width: 100%; }
+.gate-note { margin: 0; color: var(--ink-3); font-size: .9375rem; }
+.gate-links { display: flex; justify-content: center; gap: 20px; }
+.gate .form-error, .users-panel .form-error { margin: 0; }
+
+.userbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 20px;
+  padding-bottom: 14px; border-bottom: 1px solid var(--line); margin-bottom: -8px; font-size: 1rem; color: var(--ink-2); }
+.who strong { color: var(--ink); }
+.userbar-actions { display: flex; flex-wrap: wrap; gap: 6px 18px; }
+.userbar .link-btn[aria-pressed="true"] { text-decoration-thickness: 3px; }
+.role-chip { display: inline-block; background: var(--accent-soft); color: var(--accent-ink); border-radius: 99px; padding: 0 9px; font-size: .8125rem; font-weight: 700; vertical-align: 1px; }
+.you-chip { display: inline-block; background: var(--surface-2); color: var(--ink-2); border: 1px solid var(--line); border-radius: 99px; padding: 0 9px; font-size: .8125rem; font-weight: 700; }
+
+.stack { display: flex; flex-direction: column; gap: 28px; }
+.users-panel { display: flex; flex-direction: column; gap: 20px; }
+.users-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 8px 20px; }
+.users-head h2 { font-size: 1.5rem; font-weight: 700; }
+.users-head h2:focus { outline: none; }
+.users-sub { margin: 4px 0 0; color: var(--ink-2); font-size: 1rem; }
+.users-add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1fr) minmax(0, 150px) auto; }
+.users-add h3 { grid-column: 1 / -1; font-size: 1.25rem; font-weight: 600; }
+.users-hint { grid-column: 1 / -1; margin: -4px 0 0; color: var(--ink-3); font-size: .9375rem; }
+.field select { width: 100%; height: 52px; padding: 0 12px; font-size: 1.125rem; background: var(--surface-2); border: 1.5px solid var(--line); border-radius: var(--r-ctl); }
+.field select:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+@media (max-width: 960px) { .users-add { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } .users-add .btn-primary { grid-column: 1 / -1; } }
+@media (max-width: 480px) { .users-add { grid-template-columns: minmax(0, 1fr); } }
+
+.user-list { list-style: none; margin: 0; padding: 0; background: var(--surface); border-radius: var(--r-card); box-shadow: var(--shadow); overflow: hidden; }
+.user-row { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 6px 16px; align-items: center; padding: 16px 20px; border-top: 1px solid var(--line); }
+.user-row:first-child { border-top: 0; }
+.user-row .avatar { grid-row: auto; }
+.user-info { min-width: 0; display: flex; flex-direction: column; gap: 4px; }
+.user-line { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; }
+.user-line strong { font-size: 1.125rem; }
+.user-handle { color: var(--ink-3); font-size: 1rem; }
+.user-status { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; color: var(--ink-2); font-size: .9375rem; }
+.user-status .tag { border-radius: 99px; padding: 1px 10px; font-weight: 700; font-size: .8125rem; background: var(--accent-soft); color: var(--accent-ink); }
+.user-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 16px; }
+.link-btn.danger { color: var(--red-ink); }
+.user-inline { grid-column: 2 / -1; background: var(--surface-2); border-radius: var(--r-ctl); padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+.user-inline.confirm { background: var(--red-soft); }
+.inline-form { display: flex; flex-direction: column; gap: 8px; }
+.inline-form label { font-size: .9375rem; font-weight: 700; color: var(--ink-2); }
+.inline-row { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.inline-row input { flex: 1 1 200px; min-width: 0; height: 44px; padding: 0 12px; font-size: 1.0625rem; background: var(--surface); border: 1.5px solid var(--line); border-radius: 10px; }
+.inline-row input:focus { border-color: var(--accent); outline: none; box-shadow: 0 0 0 3px var(--accent-soft); }
+.inline-note { margin: 0; color: var(--ink-3); font-size: .9375rem; }
+.btn-small { height: 44px; padding: 0 16px; border: 0; border-radius: 10px; background: var(--ink); color: var(--bg); font-weight: 700; font-size: 1rem; cursor: pointer; }
+.btn-small.danger { background: var(--red); color: #FFFFFF; }
+.btn-small:disabled, .btn-primary:disabled { opacity: .65; cursor: default; }
+.user-empty { padding: 24px 20px; color: var(--ink-2); }
+.user-empty.error { color: var(--red-ink); }
+@media (max-width: 640px) {
+  .user-row { grid-template-columns: 44px minmax(0, 1fr); }
+  .user-actions { grid-column: 1 / -1; justify-content: flex-start; }
+  .user-inline { grid-column: 1 / -1; }
+}
+
 /* Rainbow accent */
 .top h1 { background: var(--rainbow); -webkit-background-clip: text; background-clip: text; color: transparent; padding-bottom: .06em; }
 .btn-primary { background: var(--rainbow); color: #FFFFFF; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
@@ -271,7 +337,54 @@ button, input { font: inherit; color: inherit; }
 </head>
 <body>
 <canvas id="cats" aria-hidden="true"></canvas>
-<main class="wrap">
+<div class="boot" id="boot" role="status">Loading…</div>
+
+<div class="gate" id="gate" hidden>
+  <form class="gate-card" id="login-form" novalidate hidden>
+    <h1>Meeting actions</h1>
+    <p class="gate-intro">Sign in to see and update your team’s actions.</p>
+    <div class="field">
+      <label for="login-user">Username</label>
+      <input id="login-user" type="text" autocomplete="username" autocapitalize="none" spellcheck="false" placeholder="e.g. priya">
+    </div>
+    <div class="field">
+      <label for="login-pass">Password</label>
+      <input id="login-pass" type="password" autocomplete="current-password">
+    </div>
+    <p class="form-error" id="login-error" hidden></p>
+    <button class="btn-primary" type="submit" id="login-btn">Sign in</button>
+    <p class="gate-note">No account, or forgot your password? Ask an admin on your team.</p>
+  </form>
+
+  <form class="gate-card" id="pw-form" novalidate hidden>
+    <h1 id="pw-title">Choose your own password</h1>
+    <p class="gate-intro" id="pw-intro"></p>
+    <div class="field">
+      <label for="pw-new">New password</label>
+      <input id="pw-new" type="password" autocomplete="new-password" placeholder="At least 6 characters">
+    </div>
+    <div class="field">
+      <label for="pw-confirm">Type it again</label>
+      <input id="pw-confirm" type="password" autocomplete="new-password">
+    </div>
+    <p class="form-error" id="pw-error" hidden></p>
+    <button class="btn-primary" type="submit" id="pw-save">Save password</button>
+    <div class="gate-links">
+      <button class="link-btn muted" type="button" id="pw-cancel" hidden>Cancel</button>
+      <button class="link-btn muted" type="button" id="pw-signout" hidden>Sign out</button>
+    </div>
+  </form>
+</div>
+
+<main class="wrap" id="app" hidden>
+  <div class="userbar">
+    <span class="who">Signed in as <strong id="who-name"></strong> <span class="role-chip" id="who-role" hidden>Admin</span></span>
+    <span class="userbar-actions">
+      <button class="link-btn" type="button" id="open-users" aria-pressed="false" hidden>Manage users</button>
+      <button class="link-btn" type="button" id="open-pw">Change password</button>
+      <button class="link-btn" type="button" id="sign-out">Sign out</button>
+    </span>
+  </div>
   <header class="top">
     <div>
       <h1>Meeting actions</h1>
@@ -280,6 +393,42 @@ button, input { font: inherit; color: inherit; }
     <div class="today"><span>Today is <strong id="today-date"></strong></span><span class="sync" id="sync" role="status"><span class="dot" aria-hidden="true"></span><span>Connecting…</span></span></div>
   </header>
 
+  <section class="users-panel" id="users-panel" hidden aria-labelledby="users-title">
+    <div class="users-head">
+      <div>
+        <h2 id="users-title" tabindex="-1">Manage users</h2>
+        <p class="users-sub"><span id="user-count"></span> · Passwords are stored by Supabase Auth and are never shown here.</p>
+      </div>
+      <button class="link-btn" type="button" id="close-users">Back to actions</button>
+    </div>
+
+    <form class="add users-add" id="user-form" novalidate>
+      <h3>Add a user</h3>
+      <div class="field">
+        <label for="u-username">Username</label>
+        <input id="u-username" type="text" autocomplete="off" autocapitalize="none" spellcheck="false" placeholder="e.g. dan">
+      </div>
+      <div class="field">
+        <label for="u-name">Display name</label>
+        <input id="u-name" type="text" autocomplete="off" placeholder="e.g. Dan Tan">
+      </div>
+      <div class="field">
+        <label for="u-pass">Initial password</label>
+        <input id="u-pass" type="text" autocomplete="off" spellcheck="false" placeholder="At least 6 characters">
+      </div>
+      <div class="field">
+        <label for="u-role">Role</label>
+        <select id="u-role"><option value="member">Member</option><option value="admin">Admin</option></select>
+      </div>
+      <button class="btn-primary" type="submit" id="u-submit">Add user</button>
+      <p class="form-error" id="user-form-msg" hidden></p>
+      <p class="users-hint">They’ll sign in with this username and password, then be asked to choose their own password.</p>
+    </form>
+
+    <ul class="user-list" id="user-list"></ul>
+  </section>
+
+  <div class="stack" id="actions-view">
   <section class="tallies" aria-label="Summary">
     <div class="tally"><span class="l">Open</span><span class="n" id="n-open">0</span><span class="sub" id="s-open">&nbsp;</span></div>
     <div class="tally overdue" id="t-overdue"><span class="l">Overdue</span><span class="n" id="n-overdue">0</span><span class="sub" id="s-overdue">&nbsp;</span></div>
@@ -323,6 +472,7 @@ button, input { font: inherit; color: inherit; }
   </div>
 
   <section class="owners" id="owners" aria-live="polite"></section>
+  </div>
 </main>
 
 <div class="toast" id="toast" role="status" hidden><span id="toast-msg"></span><button type="button" id="toast-undo">Undo</button></div>
@@ -417,6 +567,7 @@ button, input { font: inherit; color: inherit; }
 
   // ---- Data access ----
   function load() {
+    if (!session) return Promise.resolve();
     if (!db) { loadError = 'The database library didn’t load. Check your connection and reload the page.'; render(); setStatus('err', 'Offline'); return Promise.resolve(); }
     return db.from(TABLE).select('*').order('created_at', { ascending: true }).then(function (res) {
       if (res.error) throw res.error;
@@ -434,7 +585,7 @@ button, input { font: inherit; color: inherit; }
 
   function subscribe() {
     if (!db || !db.channel) return;
-    db.channel('meeting-actions-live')
+    channel = db.channel('meeting-actions-live')
       .on('postgres_changes', { event: '*', schema: 'public', table: TABLE }, function (p) {
         if (p.eventType === 'DELETE') { if (p.old && p.old.id) dropRow(p.old.id); }
         else if (p.new && p.new.id) { putRow(p.new); }
@@ -633,7 +784,10 @@ button, input { font: inherit; color: inherit; }
 
     var dl = document.getElementById('owner-list');
     dl.innerHTML = '';
-    list.forEach(function (g) { if (!g.unassigned) { var o = document.createElement('option'); o.value = g.name; dl.appendChild(o); } });
+    var names = {};
+    team.forEach(function (m) { names[m.display_name.toLowerCase()] = m.display_name; });
+    list.forEach(function (g) { if (!g.unassigned && !names[g.name.toLowerCase()]) names[g.name.toLowerCase()] = g.name; });
+    Object.keys(names).sort().forEach(function (k) { var o = document.createElement('option'); o.value = names[k]; dl.appendChild(o); });
 
     var root = document.getElementById('owners');
     root.innerHTML = '';
@@ -720,8 +874,9 @@ button, input { font: inherit; color: inherit; }
       fErr.hidden = false;
       return;
     }
+    var member = team.find(function (m) { return m.display_name.toLowerCase() === owner.toLowerCase() || m.username === owner.toLowerCase(); });
     var match = rows.find(function (r) { return (r.owner || '').trim().toLowerCase() === owner.toLowerCase(); });
-    if (match) owner = match.owner.trim();
+    if (member) owner = member.display_name; else if (match) owner = match.owner.trim();
     fErr.hidden = true;
     addAction(text, owner, due);
     fText.value = '';
@@ -737,12 +892,338 @@ button, input { font: inherit; color: inherit; }
   var td = document.getElementById('today-date');
   td.textContent = t.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
-  // Refresh when the tab comes back (catches anything missed while asleep) and every 2 minutes as a backstop.
-  document.addEventListener('visibilitychange', function () { if (!document.hidden) { render(); load(); } });
-  setInterval(function () { if (!document.hidden) load(); }, 120000);
+  // =================== Accounts: sign in, sign out, passwords, user management ===================
+  var EMAIL_DOMAIN = 'meeting-actions.local';
+  var session = null, profile = null, team = [], channel = null;
+  var appEl = document.getElementById('app');
+  var gateEl = document.getElementById('gate');
+  var loginForm = document.getElementById('login-form');
+  var pwForm = document.getElementById('pw-form');
+  var bootEl = document.getElementById('boot');
 
-  render();
-  load().then(subscribe);
+  function signedIn() { return !!(session && profile && !profile.must_change_password); }
+  function toEmail(u) { u = u.trim().toLowerCase(); return u.indexOf('@') > -1 ? u : u + '@' + EMAIL_DOMAIN; }
+
+  function showView(name) {
+    bootEl.hidden = name !== 'boot';
+    gateEl.hidden = !(name === 'login' || name === 'pw');
+    loginForm.hidden = name !== 'login';
+    pwForm.hidden = name !== 'pw';
+    appEl.hidden = name !== 'app';
+  }
+
+  function formError(id, msg) {
+    var e = document.getElementById(id);
+    e.textContent = msg || '';
+    e.hidden = !msg;
+  }
+  function busy(btn, on, label) {
+    if (!btn.dataset.label) btn.dataset.label = btn.textContent;
+    btn.disabled = on;
+    btn.textContent = on ? label : btn.dataset.label;
+  }
+
+  // ---- Sign in ----
+  loginForm.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var user = document.getElementById('login-user').value;
+    var pass = document.getElementById('login-pass').value;
+    if (!user.trim() || !pass) { formError('login-error', 'Enter your username and password.'); return; }
+    if (!db) { formError('login-error', 'The sign-in service didn’t load. Check your connection and reload the page.'); return; }
+    formError('login-error', '');
+    var btn = document.getElementById('login-btn');
+    busy(btn, true, 'Signing in…');
+    db.auth.signInWithPassword({ email: toEmail(user), password: pass }).then(function (res) {
+      busy(btn, false);
+      if (res.error) {
+        var m = /invalid/i.test(res.error.message)
+          ? 'That username and password don’t match. Check them and try again.'
+          : res.error.message;
+        formError('login-error', m);
+        return;
+      }
+      document.getElementById('login-pass').value = '';
+      return afterAuth(res.data.session);
+    }).catch(function (err) {
+      busy(btn, false);
+      console.error(err);
+      formError('login-error', 'Couldn’t reach the sign-in service. Check your connection and try again.');
+    });
+  });
+
+  function afterAuth(s) {
+    session = s;
+    if (!session) { profile = null; leaveApp(); showView('login'); return Promise.resolve(); }
+    return db.from('profiles').select('*').eq('id', session.user.id).maybeSingle().then(function (res) {
+      if (res.error) throw res.error;
+      if (!res.data) {
+        return db.auth.signOut({ scope: 'local' }).then(function () {
+          session = null; showView('login');
+          formError('login-error', 'This account doesn’t have access to the tracker. Ask an admin to add you.');
+        });
+      }
+      profile = res.data;
+      if (profile.must_change_password) { openPasswordForm(true); return; }
+      enterApp();
+    }).catch(function (err) {
+      console.error(err);
+      showView('login');
+      formError('login-error', 'Signed in, but your profile couldn’t be loaded. Try again.');
+    });
+  }
+
+  // ---- Password change (forced after first sign-in, or by choice) ----
+  var pwForced = false;
+  function openPasswordForm(forced) {
+    pwForced = forced;
+    document.getElementById('pw-title').textContent = forced ? 'Choose your own password' : 'Change your password';
+    document.getElementById('pw-intro').textContent = forced
+      ? 'Hi ' + profile.display_name + '. You signed in with the initial password your admin set. Pick a new one to continue.'
+      : 'Pick a new password for ' + profile.display_name + ' (@' + profile.username + ').';
+    document.getElementById('pw-cancel').hidden = forced;
+    document.getElementById('pw-signout').hidden = !forced;
+    document.getElementById('pw-new').value = '';
+    document.getElementById('pw-confirm').value = '';
+    formError('pw-error', '');
+    showView('pw');
+    document.getElementById('pw-new').focus();
+  }
+  pwForm.addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var a = document.getElementById('pw-new').value, b = document.getElementById('pw-confirm').value;
+    if (a.length < 6) { formError('pw-error', 'Use at least 6 characters.'); return; }
+    if (a !== b) { formError('pw-error', 'The two passwords don’t match.'); return; }
+    var btn = document.getElementById('pw-save');
+    busy(btn, true, 'Saving…');
+    db.auth.updateUser({ password: a }).then(function (res) {
+      if (res.error) {
+        var code = res.error.code || '';
+        var m = code === 'same_password' ? 'Pick a password that’s different from your current one.'
+          : code === 'weak_password' ? 'That password is too easy to guess. Try a longer one.'
+          : res.error.message;
+        throw new Error(m);
+      }
+      return db.rpc('mark_password_changed');
+    }).then(function (res) {
+      if (res && res.error) throw res.error;
+      busy(btn, false);
+      profile.must_change_password = false;
+      var wasForced = pwForced;
+      enterApp();
+      showToast(wasForced ? 'Password saved. Welcome, ' + profile.display_name + '.' : 'Password changed');
+    }).catch(function (err) {
+      busy(btn, false);
+      console.error(err);
+      formError('pw-error', err.message || 'Couldn’t save the password. Try again.');
+    });
+  });
+  document.getElementById('pw-cancel').addEventListener('click', function () { showView('app'); });
+  document.getElementById('pw-signout').addEventListener('click', signOut);
+  document.getElementById('open-pw').addEventListener('click', function () { openPasswordForm(false); });
+
+  // ---- Sign out ----
+  function signOut() {
+    db.auth.signOut({ scope: 'local' }).finally(function () {
+      session = null; profile = null;
+      leaveApp();
+      showView('login');
+      document.getElementById('login-user').focus();
+    });
+  }
+  document.getElementById('sign-out').addEventListener('click', signOut);
+
+  // ---- Enter / leave the app ----
+  function enterApp() {
+    showView('app');
+    document.getElementById('who-name').textContent = profile.display_name;
+    document.getElementById('who-role').hidden = profile.role !== 'admin';
+    document.getElementById('open-users').hidden = profile.role !== 'admin';
+    closeUsers();
+    loadTeam();
+    render();
+    load().then(function () { if (!channel) subscribe(); });
+  }
+  function leaveApp() {
+    if (channel && db) { db.removeChannel(channel); }
+    channel = null;
+    rows = []; team = []; loaded = false; loadError = null;
+    setStatus('', 'Signed out');
+    closeUsers();
+  }
+
+  function loadTeam() {
+    return db.from('profiles').select('id, username, display_name, role').order('display_name').then(function (res) {
+      if (!res.error) { team = res.data || []; render(); }
+    });
+  }
+
+  // ---- Manage users (admins) ----
+  var usersPanel = document.getElementById('users-panel');
+  var actionsView = document.getElementById('actions-view');
+  var adminUsers = [];
+  var openRow = null;   // { id, kind: 'reset' | 'remove' }
+
+  function openUsers() {
+    if (!profile || profile.role !== 'admin') return;
+    usersPanel.hidden = false; actionsView.hidden = true;
+    document.getElementById('open-users').setAttribute('aria-pressed', 'true');
+    refreshUsers();
+    document.getElementById('users-title').focus();
+  }
+  function closeUsers() {
+    usersPanel.hidden = true; actionsView.hidden = false;
+    document.getElementById('open-users').setAttribute('aria-pressed', 'false');
+    openRow = null;
+  }
+  document.getElementById('open-users').addEventListener('click', function () { usersPanel.hidden ? openUsers() : closeUsers(); });
+  document.getElementById('close-users').addEventListener('click', closeUsers);
+
+  function callAdmin(body) {
+    return db.functions.invoke('manage-users', { body: body }).then(function (res) {
+      if (!res.error) return res.data;
+      var ctx = res.error.context;
+      var p = (ctx && typeof ctx.json === 'function') ? ctx.json().catch(function () { return null; }) : Promise.resolve(null);
+      return p.then(function (j) { throw new Error((j && j.error) || 'Couldn’t reach the user service. Try again.'); });
+    });
+  }
+
+  function refreshUsers() {
+    var list = document.getElementById('user-list');
+    if (!adminUsers.length) { list.innerHTML = ''; list.appendChild(el('li', 'user-empty', 'Loading users…')); }
+    return callAdmin({ action: 'list' }).then(function (data) {
+      adminUsers = data.users || [];
+      renderUsers();
+      loadTeam();
+    }).catch(function (err) {
+      list.innerHTML = '';
+      list.appendChild(el('li', 'user-empty error', err.message));
+    });
+  }
+
+  function fmtWhen(isoStr) {
+    if (!isoStr) return null;
+    var d = new Date(isoStr);
+    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }) + ', ' + d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+  }
+
+  function renderUsers() {
+    var list = document.getElementById('user-list');
+    list.innerHTML = '';
+    document.getElementById('user-count').textContent = plural(adminUsers.length, 'user');
+    adminUsers.forEach(function (u) {
+      var me = u.id === profile.id;
+      var li = el('li', 'user-row');
+      var av = el('div', 'avatar', initials(u.display_name)); av.setAttribute('aria-hidden', 'true');
+      var info = el('div', 'user-info');
+      var line1 = el('div', 'user-line');
+      line1.appendChild(el('strong', null, u.display_name));
+      line1.appendChild(el('span', 'user-handle', '@' + u.username));
+      if (u.role === 'admin') line1.appendChild(el('span', 'role-chip', 'Admin'));
+      if (me) line1.appendChild(el('span', 'you-chip', 'You'));
+      info.appendChild(line1);
+      var st = el('div', 'user-status');
+      if (u.must_change_password) st.appendChild(el('span', 'tag today', 'Hasn’t set own password'));
+      var when = fmtWhen(u.last_sign_in_at);
+      st.appendChild(el('span', null, when ? 'Last signed in ' + when : 'Never signed in'));
+      info.appendChild(st);
+
+      var acts = el('div', 'user-actions');
+      function act(label, fn, cls) { var b = el('button', 'link-btn' + (cls ? ' ' + cls : ''), label); b.type = 'button'; b.addEventListener('click', fn); acts.appendChild(b); return b; }
+      act('Reset password', function () { openRow = { id: u.id, kind: 'reset' }; renderUsers(); var i = document.getElementById('reset-' + u.id); if (i) i.focus(); });
+      if (!me) act(u.role === 'admin' ? 'Make member' : 'Make admin', function (ev) { setRole(u, u.role === 'admin' ? 'member' : 'admin', ev.target); });
+      if (!me) act('Remove', function () { openRow = { id: u.id, kind: 'remove' }; renderUsers(); }, 'danger');
+
+      li.appendChild(av); li.appendChild(info); li.appendChild(acts);
+
+      if (openRow && openRow.id === u.id) {
+        var box = el('div', 'user-inline');
+        if (openRow.kind === 'reset') {
+          var f = el('form', 'inline-form'); f.noValidate = true;
+          var lab = el('label', null, 'New password for ' + u.display_name); lab.htmlFor = 'reset-' + u.id;
+          var inp = document.createElement('input'); inp.type = 'text'; inp.id = 'reset-' + u.id; inp.autocomplete = 'off'; inp.placeholder = 'At least 6 characters';
+          var save = el('button', 'btn-small', 'Set password'); save.type = 'submit';
+          var cancel = el('button', 'link-btn muted', 'Cancel'); cancel.type = 'button';
+          cancel.addEventListener('click', function () { openRow = null; renderUsers(); });
+          var note = el('p', 'inline-note', me ? 'You’ll keep using this password.' : u.display_name + ' will be asked to choose their own password after signing in with it.');
+          var err = el('p', 'form-error'); err.hidden = true;
+          f.addEventListener('submit', function (ev) {
+            ev.preventDefault();
+            if (inp.value.length < 6) { err.textContent = 'Use at least 6 characters.'; err.hidden = false; return; }
+            busy(save, true, 'Saving…');
+            callAdmin({ action: 'reset_password', user_id: u.id, password: inp.value }).then(function () {
+              openRow = null; showToast('Password reset for ' + u.display_name); return refreshUsers();
+            }).catch(function (e) { busy(save, false); err.textContent = e.message; err.hidden = false; });
+          });
+          var row = el('div', 'inline-row'); row.appendChild(inp); row.appendChild(save); row.appendChild(cancel);
+          f.appendChild(lab); f.appendChild(row); f.appendChild(note); f.appendChild(err);
+          box.appendChild(f);
+        } else {
+          box.classList.add('confirm');
+          box.appendChild(el('span', null, 'Remove ' + u.display_name + '? They won’t be able to sign in. Their actions stay on the list.'));
+          var row2 = el('div', 'inline-row');
+          var yes = el('button', 'btn-small danger', 'Remove ' + u.display_name); yes.type = 'button';
+          var no = el('button', 'link-btn muted', 'Cancel'); no.type = 'button';
+          no.addEventListener('click', function () { openRow = null; renderUsers(); });
+          yes.addEventListener('click', function () {
+            busy(yes, true, 'Removing…');
+            callAdmin({ action: 'delete', user_id: u.id }).then(function () {
+              openRow = null; showToast(u.display_name + ' removed'); return refreshUsers();
+            }).catch(function (e) { busy(yes, false); showToast(e.message); });
+          });
+          row2.appendChild(yes); row2.appendChild(no);
+          box.appendChild(row2);
+        }
+        li.appendChild(box);
+      }
+      list.appendChild(li);
+    });
+  }
+
+  function setRole(u, role, btn) {
+    busy(btn, true, 'Saving…');
+    callAdmin({ action: 'set_role', user_id: u.id, role: role }).then(function () {
+      showToast(u.display_name + ' is now ' + (role === 'admin' ? 'an admin' : 'a member'));
+      return refreshUsers();
+    }).catch(function (e) { busy(btn, false); showToast(e.message); });
+  }
+
+  document.getElementById('user-form').addEventListener('submit', function (ev) {
+    ev.preventDefault();
+    var username = document.getElementById('u-username').value.trim().toLowerCase();
+    var name = document.getElementById('u-name').value.trim();
+    var pass = document.getElementById('u-pass').value;
+    var role = document.getElementById('u-role').value;
+    formError('user-form-msg', '');
+    if (!/^[a-z0-9][a-z0-9._-]{1,31}$/.test(username)) { formError('user-form-msg', 'Usernames need 2 to 32 characters: lowercase letters, numbers, dots, dashes or underscores.'); document.getElementById('u-username').focus(); return; }
+    if (pass.length < 6) { formError('user-form-msg', 'The initial password needs at least 6 characters.'); document.getElementById('u-pass').focus(); return; }
+    var btn = document.getElementById('u-submit');
+    busy(btn, true, 'Adding…');
+    callAdmin({ action: 'create', username: username, display_name: name || username, password: pass, role: role }).then(function () {
+      busy(btn, false);
+      showToast((name || username) + ' added. They sign in as “' + username + '”.');
+      document.getElementById('u-username').value = '';
+      document.getElementById('u-name').value = '';
+      document.getElementById('u-pass').value = '';
+      document.getElementById('u-role').value = 'member';
+      return refreshUsers();
+    }).catch(function (e) { busy(btn, false); formError('user-form-msg', e.message); });
+  });
+
+  // ---- Boot ----
+  document.addEventListener('visibilitychange', function () { if (!document.hidden && signedIn()) { render(); load(); } });
+  setInterval(function () { if (!document.hidden && signedIn()) load(); }, 120000);
+
+  if (!db) {
+    showView('login');
+    formError('login-error', 'The sign-in service didn’t load. Check your connection and reload the page.');
+  } else {
+    db.auth.onAuthStateChange(function (event, s) {
+      if (event === 'SIGNED_OUT' && session) { session = null; profile = null; leaveApp(); showView('login'); }
+      else if (s) { session = s; }
+    });
+    db.auth.getSession().then(function (res) { return afterAuth(res.data && res.data.session); })
+      .catch(function () { showView('login'); });
+  }
 })();
 </script>
 <script>

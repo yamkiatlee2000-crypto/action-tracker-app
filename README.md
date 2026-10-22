@@ -23,6 +23,24 @@ New actions get ids starting `ma-`. Changes appear for everyone straight away th
 
 The page uses the project's **publishable** key, which is designed to sit in browser code. What anyone can do with it is set by the table's row-level security policies. These currently allow anyone with the key to read, add, edit and delete, so anyone with the site link can change the list.
 
+## Accounts and sign-in
+
+Everyone signs in with a username and password before seeing the tracker. Accounts use Supabase Auth (`auth.users`), which stores passwords as hashes. Each account has a row in `public.profiles`:
+
+| Column | Meaning |
+| --- | --- |
+| `id` | Same id as the `auth.users` row (deleted together) |
+| `username` | What people type to sign in. Their Auth email is `<username>@meeting-actions.local`; no email is ever sent. |
+| `display_name` | Shown in the app and suggested as an action owner |
+| `role` | `admin` can open **Manage users**; `member` cannot |
+| `must_change_password` | `true` until the person picks their own password after first sign-in or a reset |
+
+**Admins** can add users with an initial password, reset passwords, switch roles and remove users from the **Manage users** screen. Those requests go to the `manage-users` Edge Function (`supabase/functions/manage-users`), which checks the caller is an admin and uses the service role key held by Supabase. The secret key is never in the web page.
+
+Only signed-in tracker users can read `profiles`. Nobody can write to it directly from the browser.
+
+The database changes are recorded in `supabase/migrations/`.
+
 "Hide done" is a per-browser preference kept in `localStorage`. Actions saved by the earlier browser-only version can be uploaded once with the **Upload them** prompt.
 
 ## Files
